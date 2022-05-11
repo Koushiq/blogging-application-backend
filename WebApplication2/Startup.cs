@@ -15,6 +15,9 @@ using System.Threading.Tasks;
 using WebApplication2.Data;
 using WebApplication2.Factories;
 using WebApplication2.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace WebApplication2
 {
@@ -68,7 +71,8 @@ namespace WebApplication2
 
             services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IPrepareLoginModelFactory, PrepareLoginModelFactory>();
+            services.AddScoped<ILoginModelFactory, LoginModelFactory>();
+            services.AddScoped<IJWTService, JWTService>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddControllers(options =>
             {
@@ -99,6 +103,9 @@ namespace WebApplication2
             .AllowAnyOrigin()
             .AllowAnyMethod()
             .AllowAnyHeader());
+
+            app.UseAuthentication();
+            //app.UseMvc();
 
             app.UseHttpsRedirection();
 

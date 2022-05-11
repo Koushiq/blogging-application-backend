@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using WebApplication2.Factories;
 using WebApplication2.Models;
 using WebApplication2.Services;
 
@@ -11,10 +12,13 @@ namespace WebApplication2.Controllers
     public class LoginController : ControllerBase
     {
         private readonly IUserService userService;
+        private readonly ILoginModelFactory loginModelFactory;
 
-        public LoginController(IUserService userService)
+        public LoginController(IUserService userService,
+                               ILoginModelFactory loginModelFactory)
         {
             this.userService = userService;
+            this.loginModelFactory = loginModelFactory;
         }
         //[HttpGet]
         //[Route("login")]
@@ -32,26 +36,16 @@ namespace WebApplication2.Controllers
         //}
         [HttpPost]
         [Route("login")]
-        public async Task<ActionResult<LoginModel>> IndexAsync(LoginModel loginModel)
+        public async Task<ActionResult<TokenResponse>> IndexAsync(LoginModel loginModel)
         {
             if (loginModel == null)
             {
                 throw new ArgumentException();
             }
-            if (!ModelState.IsValid)
-            {
-                return loginModel;
-            }
-            //string username = loginModel.Username;
-            //string password = loginModel.Password;
-            //var customer = await userService.GetCustomer(username, password);
 
-            //if (customer == null)
-            //{
-            //    return NoContent();
-            //}
+            var token = await this.loginModelFactory.PrepareTokenResponseAsync(loginModel);
 
-            //return Ok();
+            return token;
 
         }
     }
